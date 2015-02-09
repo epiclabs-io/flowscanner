@@ -20,8 +20,17 @@ char* target3 = "HTTP/1.0 200 OK\r\n"
 "</html>\r\n";
 
 
+//char * targetDNS = "\x06\x05\x81\x80\x00\x01\x00\x03\x00\x00\x00\x00\x03\x77\x77\x77\x08\x66\x72\x69\x65\x6e\x64\x65\x76\x03\x63\x6f\x6d\x00\x00\x01\x00\x01\xc0\x0c\x00\x05\x00\x01\x00\x00\x03\xc5\x00\x0a\x07\x70\x72\x61\x65\x74\x6f\x72\xc0\x10\xc0\x2e\x00\x05\x00\x01\x00\x00\x03\xc5\x00\x06\x03\x69\x70\x31\xc0\x10\xc0\x44\x00\x01\x00\x01\x00\x00\x03\xc5\x00\x04\x55\xd6\x81\x43";
+
+char * targetDNS = "\x79\x79\x00\x01\x00\x01\x00\x00\x03\xc5\x00\x04\x55\xd6\x81\x43";
+
+
+char* targetZero = "\0abc\0test";
 
 DEFINE_FLOWPATTERN(pattern3, "HTTP/%*1d.%*1d %d%*100[^\r\n]\r\n");
+DEFINE_FLOWPATTERN(testzero, "%*[\0]abc%*[\0]test"); //"%0abc%0test"
+
+DEFINE_FLOWPATTERN(catchDNSResponse, "%*1[\0]\x01" "%*1[\0]\x01" "%*4c" "%*1[\0]\x04" "%4c");
 
 
 void test1()
@@ -29,6 +38,22 @@ void test1()
 
 
 	FlowScanner flow;
+
+	flow.setPattern(catchDNSResponse);
+	uint8_t ip[4];
+	int n = 16; //180; //length of DNS capture above.
+	for (char* c = targetDNS; n>0;c++,n--)
+	{
+		if (flow.scan(*c, ip))
+		{
+			printf("%d.%d.%d.%d\n", ip[0], ip[1], ip[2], ip[3]);
+			break;
+		}
+	}
+
+	
+	
+	return;
 
 	uint16_t len;
 	uint8_t* t;
@@ -44,7 +69,14 @@ void test1()
 		printf("status = %d\n", status);
 	}
 	
-	
+	len = 9;
+	t = (uint8_t*)targetZero;
+
+	flow.setPattern(testzero);
+	if (flow.scan(&t, &len, &status))
+	{
+		printf("OK");
+	}
 
 
 }

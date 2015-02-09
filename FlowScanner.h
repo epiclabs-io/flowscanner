@@ -1,30 +1,13 @@
 #ifndef __FlowScanner_H
 #define __FlowScanner_H
 
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-	#include <avr/pgmspace.h>
-#else
-	#if defined(WIN32) || defined(UNIX)
-
-		#include <inttypes.h>
-		#include <iostream>
-
-		#define PSTR(x) x
-		#define pgm_read_byte(str) (*(str))
-		#define PGM_P const char*
-		#define PROGMEM
-
-		#define min(x,y) ((x) < (y)? (x) : (y))
-
-	#endif
-#endif
+#include <Across/Across.h>
 
 #include <stdarg.h>
 
 
 //defines a new FlowPattern object with its pattern string stored in PROGMEM
-#define DEFINE_FLOWPATTERN(name, pattern) const char name##string[] PROGMEM = pattern;FlowPattern name ( name##string );
+#define DEFINE_FLOWPATTERN(name, pattern) static const char name##string[] PROGMEM = pattern;FlowPattern name ( name##string );
 
 
 class FlowScanner;
@@ -72,6 +55,7 @@ class FlowScanner
 
 
 	bool enableCapture;
+
 
 
 public:

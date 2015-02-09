@@ -2,7 +2,7 @@
 
 #include "FlowScanner.h"
 
-FlowPattern::FlowPattern(const char* scanPattern) : pattern(scanPattern)
+FlowPattern::FlowPattern(PGM_P scanPattern) : pattern(scanPattern)
 {}
 
 
@@ -83,6 +83,8 @@ void FlowScanner::init_scanset(uint8_t c)
 		negatedScanset = true;
 		nextChar();
 	}
+	else
+		negatedScanset = false;
 
 	scanset = p;
 
@@ -118,11 +120,13 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 	bool consumed = false;
 	bool r = false;
 
+
 	do
 	{
 		if (t == '%' && specifier == 0)
 		{
 			nextChar();
+
 
 			if (t != '%')
 			{
@@ -141,7 +145,8 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 					width = 0;
 					while (isdigit((int)t))
 					{
-						width = width * 10 + (nextChar() - '0');
+						width = width * 10 + (t - '0');
+						nextChar();
 					}
 				}
 				length = 2;
@@ -235,6 +240,8 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 						if (width > 0)
 							continue;
 					}
+					else
+						specifier = 0;
 				}break;
 
 
@@ -252,7 +259,7 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 
 		}
 
-		if (t == c && t != 0)
+		if (t == c && (t != 0))
 		{
 			nextChar();
 			consumed = true;
@@ -283,8 +290,8 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 
 void FlowScanner::reset()
 {
-	p = pattern->pattern;
-	t = pgm_read_byte(p);
+	p = pattern->pattern-1;
+	nextChar();
 	specifier = 0;
 	captureCount = 0;
 	pattern->signaled = 0;
@@ -326,5 +333,4 @@ char FlowScanner::nextChar()
 {
 	p++;
 	return t = pgm_read_byte(p);
-
 }
