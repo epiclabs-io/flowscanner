@@ -1,13 +1,13 @@
 #ifndef __FlowScanner_H
 #define __FlowScanner_H
 
-#include <Across/Across.h>
+#include <Across.h>
 
 #include <stdarg.h>
 
 
 //defines a new FlowPattern object with its pattern string stored in PROGMEM
-#define DEFINE_FLOWPATTERN(name, pattern) static const char name##string[] PROGMEM = pattern;FlowPattern name ( name##string );
+#define DEFINE_FLOWPATTERN(name, pattern) const char name##string[] PROGMEM = pattern;FlowPattern name ( name##string );
 
 
 class FlowScanner;
