@@ -1,7 +1,7 @@
 #ifndef __FlowScanner_H
 #define __FlowScanner_H
 
-#include <Across.h>
+#include <ACross.h>
 
 #include <stdarg.h>
 
