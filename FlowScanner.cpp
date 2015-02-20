@@ -149,33 +149,50 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 						nextChar();
 					}
 				}
-				length = 2;
-				specifier = 0;
 
-				do
+				if (width == 0) // %0 detected
 				{
-					switch (t)
+					if (c == '\0')
 					{
-						case 'd': consumed = init_d(c); break;
-
-						case '[': init_scanset(c); //fall back to 'c'
-						case 'c': init_c(args,init,c); break;
-
-						case 'h':
-						{
-							length = 1;
-						}; break;
-
-						case 'w':
-						{
-							length = 4;
-						}; break;
-
-						default:
-							break;
+						consumed = true;
+						ret = (t == 0);
+						continue;
 					}
-					nextChar();
-				} while (t != 0 && specifier == 0);
+					else
+						goto input_fail;
+				}
+				else
+				{
+					length = 2;
+					specifier = 0;
+
+
+					do
+					{
+						switch (t)
+						{
+							case 'd': consumed = init_d(c); break;
+
+							case '[': init_scanset(c); //fall back to 'c'
+							case 'c': init_c(args, init, c); break;
+							case ' ':specifier = t; break;
+
+							case 'h':
+							{
+								length = 1;
+							}; break;
+
+							case 'w':
+							{
+								length = 4;
+							}; break;
+
+							default:
+								break;
+						}
+						nextChar();
+					} while (t != 0 && specifier == 0);
+				}
 
 
 			}
@@ -243,6 +260,14 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 					else
 						specifier = 0;
 				}break;
+				
+				case ' ':
+				{
+					if (c == ' ' || c == '\t')
+						consumed = true;
+					else
+						specifier = 0;
+				}break;
 
 
 				default:
@@ -262,23 +287,23 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 		if (t == c && (t != 0))
 		{
 			nextChar();
-			consumed = true;
 			if (t == 0)
 				ret = true;
 
+			break;
 
 		}
-		else
-		{
-			if (r)
-				break;
+
+	input_fail:
+		if (r)
+			break;
 			
-			reset();
-			r = true;
-		}
+		reset();
+		r = true;
 	
 	}while (!consumed);
 
+	input_end:
 
 	va_end(init);
 

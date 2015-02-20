@@ -42,7 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\jpeletie\Dropbox\Arduino\libraries;$(IncludePath)</IncludePath>
+    <IncludePath>$(ARDUINO_LIB)\FlowScanner;$(ARDUINO_LIB)\ACross;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)-pc\</OutDir>
     <IntDir>$(Configuration)-pc\</IntDir>
   </PropertyGroup>
@@ -56,7 +56,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ARDUINO_LIB)\ACross;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

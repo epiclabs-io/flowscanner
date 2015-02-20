@@ -25,12 +25,21 @@ char* target3 = "HTTP/1.0 200 OK\r\n"
 char * targetDNS = "\x79\x79\x00\x01\x00\x01\x00\x00\x03\xc5\x00\x04\x55\xd6\x81\x43";
 
 
-char* targetZero = "\0abc\0test";
+char* targetZero = "\0abc\0test\0";
+char* targetWhitespaceTest = "hello   \tworld";
+char* targetWhitespaceTest2 = "hello+world";
+char* targetWhitespaceNumbers = "hello     79 world";
+
+
 
 DEFINE_FLOWPATTERN(pattern3, "HTTP/%*1d.%*1d %d%*100[^\r\n]\r\n");
-DEFINE_FLOWPATTERN(testzero, "%*[\0]abc%*[\0]test"); //"%0abc%0test"
+DEFINE_FLOWPATTERN(testzero, "%0abc%0test%0"); 
 
-DEFINE_FLOWPATTERN(catchDNSResponse, "%*1[\0]\x01" "%*1[\0]\x01" "%*4c" "%*1[\0]\x04" "%4c");
+DEFINE_FLOWPATTERN(catchDNSResponse, "%0\x01" "%0\x01" "%*4c" "%0\x04" "%4c"); // "%*1[\0]\x01" "%*1[\0]\x01" "%*4c" "%*1[\0]\x04" "%4c"
+
+DEFINE_FLOWPATTERN(testWhitespace, "hello% world");
+DEFINE_FLOWPATTERN(testWhitespaceNumbers, "hello% %d% world");
+
 
 
 void test1()
@@ -51,32 +60,54 @@ void test1()
 		}
 	}
 
-	
-	
-	return;
+	flow.setPattern(testWhitespace);
 
-	uint16_t len;
-	uint8_t* t;
+	char* target = targetWhitespaceTest2;
+	uint16_t len = strlen(target);
+	if (flow.scan(((uint8_t**)&target), &len))
+	{
+		printf("match whitespace");
+	}
 
-	uint16_t status;
+
+	len =10;
+	uint8_t* t = (uint8_t*)targetZero;
+
+	flow.setPattern(testzero);
+	if (flow.scan(&t, &len))
+	{
+		printf("match zeros");
+	}
+
+	
+	uint16_t x;
 
 	len = strlen(target3);
 	t = (uint8_t*)target3;
 
 	flow.setPattern(pattern3);
-	if (flow.scan(&t, &len, &status))
+	if (flow.scan(&t, &len, &x))
 	{
-		printf("status = %d\n", status);
+		printf("status = %d\n", x);
 	}
-	
-	len = 9;
-	t = (uint8_t*)targetZero;
 
-	flow.setPattern(testzero);
-	if (flow.scan(&t, &len, &status))
+
+	t = (uint8_t*)targetWhitespaceNumbers;
+	len = strlen((char*)t);
+
+	flow.setPattern(testWhitespaceNumbers);
+	if (flow.scan(&t, &len, &x))
 	{
-		printf("OK");
+		printf("number = %d\n", x);
 	}
+
+
+
+
+
+
+	getchar();	
+	return;
 
 
 }
