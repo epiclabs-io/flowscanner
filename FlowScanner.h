@@ -5,6 +5,9 @@
 
 #include <stdarg.h>
 
+//if set to 1 save 1 byte of SRAM/instance in exchange for 30 bytes of flash
+#define FS_OPTIMIZE_RAM 0    
+
 
 //defines a new FlowPattern object with its pattern string stored in PROGMEM
 #define DEFINE_FLOWPATTERN(name, pattern) const char name##string[] PROGMEM = pattern;FlowPattern name ( name##string );
@@ -35,15 +38,26 @@ class FlowScanner
 	char specifier;
 
 	uint8_t width;
+	
+#if FS_OPTIMIZE_RAM
+	struct
+	{
+		bool enableCapture : 1;
+		uint8_t captureCount : 7;
+		
+	};
+#else
+	bool enableCapture;
 	uint8_t captureCount;
+#endif
 
+	int8_t sign;
 	union
 	{
 		struct
 		{
 			int32_t value;
 			uint8_t length;
-			int8_t sign;
 		};
 		struct
 		{
@@ -52,10 +66,6 @@ class FlowScanner
 			bool negatedScanset;
 		};
 	};
-
-
-	bool enableCapture;
-
 
 
 public:
