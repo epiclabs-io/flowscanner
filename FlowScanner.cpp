@@ -2,6 +2,8 @@
 
 #include "FlowScanner.h"
 
+
+
 FlowPattern::FlowPattern(PGM_P scanPattern) : pattern(scanPattern)
 {}
 
@@ -111,6 +113,7 @@ void FlowScanner::captureInteger(va_list& args)
 
 bool FlowScanner::input(uint8_t c, va_list& args)
 {
+
 	if (isSignaled())
 		return true;
 
@@ -121,9 +124,10 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 	bool consumed = false;
 	bool r = false;
 
-
+	//dsprint("c='"); dprint((char)c); dsprintln("'");
 	do
 	{
+		//dsprint("t='"); dprint(t); dsprint("' ("); dprint((uint8_t)t); dsprintln(")");
 		if (t == '%' && specifier == 0)
 		{
 			nextChar();
@@ -157,6 +161,7 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 					{
 						consumed = true;
 						ret = (t == 0);
+						//dsprint("ret="); dprintln(ret);
 						continue;
 					}
 					else
@@ -199,7 +204,7 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 			}
 
 		}
-
+		//dsprint("spec='"); dprint(specifier); dsprintln("'");
 		if (consumed)
 			break;
 

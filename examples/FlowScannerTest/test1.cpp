@@ -1,6 +1,10 @@
 
 #include <FlowScanner.h>
+#include <ACross.h>
 
+#ifdef ACROSS_ARDUINO
+#include "printf.h"
+#endif
 
 char* target3 = "HTTP/1.0 200 OK\r\n"
 "Date: Fri, 23 Jan 2015 09:14:43 GMT\r\n"
@@ -44,9 +48,25 @@ DEFINE_FLOWPATTERN(testWhitespaceNumbers, "hello% %d% world");
 
 void test1()
 {
+#ifdef ACROSS_ARDUINO
+	printf_begin();
+#endif
 
-
+	printf("test");
 	FlowScanner flow;
+	uint16_t len;
+
+
+	len = 10;
+	uint8_t* t = (uint8_t*)targetZero;
+
+	flow.setPattern(testzero);
+	if (flow.scan(&t, &len))
+	{
+		printf("match zeros\n");
+	}
+	
+
 
 	flow.setPattern(catchDNSResponse);
 	uint8_t ip[4];
@@ -59,25 +79,22 @@ void test1()
 			break;
 		}
 	}
-
+	Serial.println("test2");
 	flow.setPattern(testWhitespace);
 
-	char* target = targetWhitespaceTest2;
-	uint16_t len = strlen(target);
+	char* target = targetWhitespaceTest;
+	len = strlen(target);
 	if (flow.scan(((uint8_t**)&target), &len))
 	{
-		printf("match whitespace");
+		printf("match whitespace\n");
 	}
+	Serial.println("test3");
 
 
-	len =10;
-	uint8_t* t = (uint8_t*)targetZero;
 
-	flow.setPattern(testzero);
-	if (flow.scan(&t, &len))
-	{
-		printf("match zeros");
-	}
+
+
+	Serial.println("test4");
 
 	
 	uint16_t x;
@@ -91,6 +108,7 @@ void test1()
 		printf("status = %d\n", x);
 	}
 
+	Serial.println("test5");
 
 	t = (uint8_t*)targetWhitespaceNumbers;
 	len = strlen((char*)t);
