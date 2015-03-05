@@ -18,7 +18,7 @@ void FlowScanner::setPattern(FlowPattern& flowPattern)
 void FlowScanner::setPos(va_list &args, va_list init, uint8_t pos)
 {
 	va_copy(args, init);
-	for (uint8_t i = 1; i < pos; i++)
+	for (uint8_t i = 0; i < pos; i++)
 		va_arg(args, uint8_t*);
 
 }
@@ -70,7 +70,7 @@ void FlowScanner::init_c(va_list &args, va_list init,uint8_t c)
 	if (specifier == 0)
 		specifier = t;
 
-	if (captureCount)
+	if (enableCapture)
 	{
 		setPos(args, init, captureCount);
 		charPtr = va_arg(args, uint8_t*);
@@ -111,7 +111,7 @@ void FlowScanner::captureInteger(va_list& args)
 }
 
 
-bool FlowScanner::input(uint8_t c, va_list& args)
+bool FlowScanner::input(uint8_t c, va_list args)
 {
 
 	if (isSignaled())
@@ -137,11 +137,11 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 			{
 				if (t == '*')
 				{
-					captureCount = 0;
+					enableCapture = false;
 					nextChar();
 				}
 				else
-					captureCount = 1;
+					enableCapture = true;
 
 
 				width = DEFAULT_WIDTH_MARKER;
@@ -204,7 +204,7 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 			}
 
 		}
-		//dsprint("spec='"); dprint(specifier); dsprintln("'");
+		
 		if (consumed)
 			break;
 
@@ -223,7 +223,7 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 							continue;
 					}
 
-					if (captureCount)
+					if (enableCapture)
 					{
 						setPos(args, init, captureCount);
 						captureCount++;
@@ -241,7 +241,7 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 				{
 					if (!isInScanset(c) || width==0)
 					{
-						if (captureCount)
+						if (enableCapture)
 							*charPtr = 0;
 
 						specifier = 0;
@@ -255,7 +255,7 @@ bool FlowScanner::input(uint8_t c, va_list& args)
 					{
 						width--;
 						consumed = true;
-						if (captureCount)
+						if (enableCapture)
 						{
 							*charPtr = c;
 							charPtr++;

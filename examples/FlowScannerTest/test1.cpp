@@ -34,6 +34,7 @@ char* targetWhitespaceTest = "hello   \tworld";
 char* targetWhitespaceTest2 = "hello+world";
 char* targetWhitespaceNumbers = "hello     79 world";
 
+char* targetHTTPRequest = "POST /test.html HTTP/1.1\r\nAccept: */*\r\nHost: www.friendev.com\r\nContent-Length: 5\r\n\r\nhello";
 
 
 DEFINE_FLOWPATTERN(pattern3, "HTTP/%*1d.%*1d %d%*100[^\r\n]\r\n");
@@ -44,6 +45,7 @@ DEFINE_FLOWPATTERN(catchDNSResponse, "%0\x01" "%0\x01" "%*4c" "%0\x04" "%4c"); /
 DEFINE_FLOWPATTERN(testWhitespace, "hello% world");
 DEFINE_FLOWPATTERN(testWhitespaceNumbers, "hello% %d% world");
 
+DEFINE_FLOWPATTERN(testHTTPRequest, "%4[^ ] %36[^ ] HTTP/%*d.%*d\r");
 
 
 void test1()
@@ -55,10 +57,10 @@ void test1()
 	printf("test");
 	FlowScanner flow;
 	uint16_t len;
-
+	uint8_t* t;
 
 	len = 10;
-	uint8_t* t = (uint8_t*)targetZero;
+	t = (uint8_t*)targetZero;
 
 	flow.setPattern(testzero);
 	if (flow.scan(&t, &len))
@@ -119,8 +121,16 @@ void test1()
 		printf("number = %d\n", x);
 	}
 
+	t = (uint8_t*)targetHTTPRequest;
+	flow.setPattern(testHTTPRequest);
+	char method[5] = "HOLA";
+	char queryString[37] = "TRON";
 
-
+	len = strlen((char*)t);
+	if (flow.scan(&t, &len, method,queryString))
+	{
+		printf("method=%s, queryString=%s\n", method,queryString);
+	}
 
 
 

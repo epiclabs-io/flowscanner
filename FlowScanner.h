@@ -34,6 +34,7 @@ class FlowScanner
 
 	uint8_t width;
 	uint8_t captureCount;
+	bool enableCapture;
 	int8_t sign;
 	union
 	{
@@ -68,7 +69,7 @@ public:
 private :
 	void setPos(va_list &args, va_list init, uint8_t pos);
 	bool isInScanset(uint8_t c);
-	bool input(uint8_t c, va_list& args);
+	bool input(uint8_t c, va_list args);
 	
 	bool init_d(uint8_t c);
 	void init_c(va_list &args, va_list init,uint8_t c);
